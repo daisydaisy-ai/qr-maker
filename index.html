@@ -189,12 +189,13 @@ function generateQR() {
   preview.width = Math.min(size, 300);
   preview.height = Math.min(size, 300);
 
-  // SVG download
+  // SVG download (use data URL for reliable download)
+  const svgDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgStr);
   const svgLink = document.getElementById('download-svg');
-  svgLink.href = svgUrl;
+  svgLink.href = svgDataUrl;
   svgLink.onclick = function(e) {
     const a = document.createElement('a');
-    a.href = this.href;
+    a.href = svgDataUrl;
     a.download = 'qrcode.svg';
     document.body.appendChild(a);
     a.click();
