@@ -190,7 +190,17 @@ function generateQR() {
   preview.height = Math.min(size, 300);
 
   // SVG download
-  document.getElementById('download-svg').href = svgUrl;
+  const svgLink = document.getElementById('download-svg');
+  svgLink.href = svgUrl;
+  svgLink.onclick = function(e) {
+    const a = document.createElement('a');
+    a.href = this.href;
+    a.download = 'qrcode.svg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    e.preventDefault();
+  };
 
   // --- PNG generation ---
   const canvas = document.createElement('canvas');
@@ -212,7 +222,17 @@ function generateQR() {
       }
     }
   }
-  document.getElementById('download-png').href = canvas.toDataURL('image/png');
+  const pngLink = document.getElementById('download-png');
+  pngLink.href = canvas.toDataURL('image/png');
+  pngLink.onclick = function(e) {
+    const a = document.createElement('a');
+    a.href = this.href;
+    a.download = 'qrcode.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    e.preventDefault();
+  };
 
   // URL link
   const urlLink = document.getElementById('generated-url-link');
