@@ -100,7 +100,7 @@ button:hover { background: #3a7bc8; }
     <input type="url" id="url" placeholder="https://example.com">
   </div>
   <div class="field">
-    <label for="param-c">c</label>
+    <label for="param-c">生協コード</label>
     <input type="text" id="param-c" placeholder="値を入力">
   </div>
   <div class="field">
@@ -116,8 +116,8 @@ button:hover { background: #3a7bc8; }
     <input type="text" id="param-campaign" placeholder="例: spring2026">
   </div>
   <div class="field">
-    <label for="qr-size">QRコードサイズ (px)</label>
-    <input type="number" id="qr-size" value="512" min="64" max="2048" step="1">
+    <label for="qr-size">QRコードサイズ（ピクセル）</label>
+    <input type="number" id="qr-size" value="300" min="64" max="2048" step="1">
   </div>
   <button onclick="generateQR()">QRコードを生成</button>
   <div id="qr-output">
@@ -152,6 +152,8 @@ function generateQR() {
   qr.make();
 
   const moduleCount = qr.getModuleCount();
+  const margin = 4; // quiet zone in modules
+  const totalModules = moduleCount + margin * 2;
   const canvas = document.getElementById('qr-canvas');
   canvas.width = size;
   canvas.height = size;
@@ -162,14 +164,14 @@ function generateQR() {
   ctx.fillRect(0, 0, size, size);
 
   // Draw QR modules
-  const cellSize = size / moduleCount;
+  const cellSize = size / totalModules;
   ctx.fillStyle = '#000000';
   for (let row = 0; row < moduleCount; row++) {
     for (let col = 0; col < moduleCount; col++) {
       if (qr.isDark(row, col)) {
         ctx.fillRect(
-          Math.floor(col * cellSize),
-          Math.floor(row * cellSize),
+          Math.floor((col + margin) * cellSize),
+          Math.floor((row + margin) * cellSize),
           Math.ceil(cellSize),
           Math.ceil(cellSize)
         );
