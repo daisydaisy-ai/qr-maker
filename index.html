@@ -110,19 +110,19 @@ button:hover { background: #3a7bc8; }
   </div>
   <div class="field">
     <label for="param-c">生協コード</label>
-    <input type="text" id="param-c" placeholder="数字を入力" inputmode="numeric" pattern="[0-9]*">
+    <input type="text" id="param-c" placeholder="数字を入力" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
   </div>
   <div class="field">
     <label for="param-source">utm_source</label>
-    <input type="text" id="param-source" placeholder="例: google">
+    <input type="text" id="param-source" placeholder="例: google" oninput="this.value=this.value.replace(/[^\x20-\x7E]/g,'')">
   </div>
   <div class="field">
     <label for="param-medium">utm_medium</label>
-    <input type="text" id="param-medium" placeholder="例: cpc">
+    <input type="text" id="param-medium" placeholder="例: cpc" oninput="this.value=this.value.replace(/[^\x20-\x7E]/g,'')">
   </div>
   <div class="field">
     <label for="param-campaign">utm_campaign</label>
-    <input type="text" id="param-campaign" placeholder="例: spring2026">
+    <input type="text" id="param-campaign" placeholder="例: spring2026" oninput="this.value=this.value.replace(/[^\x20-\x7E]/g,'')">
   </div>
   <div class="field">
     <label for="qr-size">QRコードサイズ（ピクセル）</label>
