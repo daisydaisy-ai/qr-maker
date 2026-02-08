@@ -69,6 +69,7 @@ button:hover { background: #3a7bc8; }
   display: none;
 }
 #qr-canvas {
+  border: 1px solid #ddd;
   border-radius: 4px;
 }
 #generated-url {
@@ -152,8 +153,7 @@ function generateQR() {
   qr.make();
 
   const moduleCount = qr.getModuleCount();
-  const margin = 4; // quiet zone in modules
-  const totalModules = moduleCount + margin * 2;
+  const padding = 15; // fixed 15px padding
   const canvas = document.getElementById('qr-canvas');
   canvas.width = size;
   canvas.height = size;
@@ -163,15 +163,16 @@ function generateQR() {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, size, size);
 
-  // Draw QR modules
-  const cellSize = size / totalModules;
+  // Draw QR modules centered with padding
+  const qrArea = size - padding * 2;
+  const cellSize = qrArea / moduleCount;
   ctx.fillStyle = '#000000';
   for (let row = 0; row < moduleCount; row++) {
     for (let col = 0; col < moduleCount; col++) {
       if (qr.isDark(row, col)) {
         ctx.fillRect(
-          Math.floor((col + margin) * cellSize),
-          Math.floor((row + margin) * cellSize),
+          Math.floor(padding + col * cellSize),
+          Math.floor(padding + row * cellSize),
           Math.ceil(cellSize),
           Math.ceil(cellSize)
         );
