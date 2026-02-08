@@ -110,7 +110,7 @@ button:hover { background: #3a7bc8; }
   </div>
   <div class="field">
     <label for="param-c">生協コード</label>
-    <input type="text" id="param-c" placeholder="値を入力">
+    <input type="text" id="param-c" placeholder="数字を入力" inputmode="numeric" pattern="[0-9]*">
   </div>
   <div class="field">
     <label for="param-source">utm_source</label>
@@ -149,6 +149,8 @@ function generateQR() {
   const medium = document.getElementById('param-medium').value.trim();
   const campaign = document.getElementById('param-campaign').value.trim();
 
+  // Validate: 生協コード is numbers only
+  if (c && !/^\d+$/.test(c)) { alert('生協コードは数字のみです'); return; }
   // Validate: UTM params must be ASCII only (no Japanese)
   const asciiOnly = /^[\x20-\x7E]*$/;
   if (source && !asciiOnly.test(source)) { alert('utm_source に日本語は使えません'); return; }
