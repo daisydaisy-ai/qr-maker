@@ -122,7 +122,7 @@ button:hover { background: #3a7bc8; }
   <button onclick="generateQR()">QRコードを生成</button>
   <div id="qr-output">
     <canvas id="qr-canvas"></canvas>
-    <p id="generated-url"></p>
+    <p id="generated-url"><a id="generated-url-link" href="#" target="_blank" rel="noopener" style="color:#4a90d9;word-break:break-all;font-size:0.75rem;"></a></p>
     <a id="download-link" class="download-btn" download="qrcode.png">PNGダウンロード</a>
   </div>
 </div>
@@ -179,7 +179,9 @@ function generateQR() {
     }
   }
 
-  document.getElementById('generated-url').textContent = fullUrl;
+  const urlLink = document.getElementById('generated-url-link');
+  urlLink.href = fullUrl;
+  urlLink.textContent = fullUrl;
   document.getElementById('download-link').href = canvas.toDataURL('image/png');
   document.getElementById('qr-output').style.display = 'block';
 }
