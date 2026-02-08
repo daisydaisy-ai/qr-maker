@@ -149,13 +149,27 @@ function generateQR() {
   const medium = document.getElementById('param-medium').value.trim();
   const campaign = document.getElementById('param-campaign').value.trim();
 
+  // Validate: UTM params must be ASCII only (no Japanese)
+  const asciiOnly = /^[\x20-\x7E]*$/;
+  if (source && !asciiOnly.test(source)) { alert('utm_source に日本語は使えません'); return; }
+  if (medium && !asciiOnly.test(medium)) { alert('utm_medium に日本語は使えません'); return; }
+  if (campaign && !asciiOnly.test(campaign)) { alert('utm_campaign に日本語は使えません'); return; }
+
   if (c) params.push('c=' + encodeURIComponent(c));
   if (source) params.push('utm_source=' + encodeURIComponent(source));
   if (medium) params.push('utm_medium=' + encodeURIComponent(medium));
   if (campaign) params.push('utm_campaign=' + encodeURIComponent(campaign));
 
-  const sep = url.includes('?') ? '&' : '?';
-  const fullUrl = params.length > 0 ? url + sep + params.join('&') : url;
+  // Handle anchor (#) in URL: params go before the hash
+  let base = url;
+  let hash = '';
+  const hashIdx = url.indexOf('#');
+  if (hashIdx !== -1) {
+    base = url.substring(0, hashIdx);
+    hash = url.substring(hashIdx);
+  }
+  const sep = base.includes('?') ? '&' : '?';
+  const fullUrl = params.length > 0 ? base + sep + params.join('&') + hash : url;
   const size = parseInt(document.getElementById('qr-size').value) || 500;
 
   const qr = qrcode(0, 'M');
