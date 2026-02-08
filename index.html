@@ -68,9 +68,10 @@ button:hover { background: #3a7bc8; }
   text-align: center;
   display: none;
 }
-#qr-canvas {
+#qr-preview {
   border: 1px solid #ddd;
   border-radius: 4px;
+  max-width: 100%;
 }
 #generated-url {
   margin-top: 12px;
@@ -78,11 +79,15 @@ button:hover { background: #3a7bc8; }
   color: #888;
   word-break: break-all;
 }
+.btn-group {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
 .download-btn {
   display: inline-block;
-  margin-top: 12px;
   padding: 8px 24px;
-  background: #34c759;
   color: white;
   border-radius: 8px;
   text-decoration: none;
@@ -90,7 +95,10 @@ button:hover { background: #3a7bc8; }
   font-size: 0.9rem;
   cursor: pointer;
 }
-.download-btn:hover { background: #2db84d; }
+.download-btn.svg { background: #4a90d9; }
+.download-btn.svg:hover { background: #3a7bc8; }
+.download-btn.png { background: #34c759; }
+.download-btn.png:hover { background: #2db84d; }
 </style>
 </head>
 <body>
@@ -118,13 +126,16 @@ button:hover { background: #3a7bc8; }
   </div>
   <div class="field">
     <label for="qr-size">QRコードサイズ（ピクセル）</label>
-    <input type="number" id="qr-size" value="300" min="64" max="2048" step="1">
+    <input type="number" id="qr-size" value="500" min="64" max="2048" step="1">
   </div>
   <button onclick="generateQR()">QRコードを生成</button>
   <div id="qr-output">
-    <canvas id="qr-canvas"></canvas>
+    <img id="qr-preview" />
     <p id="generated-url"><a id="generated-url-link" href="#" target="_blank" rel="noopener" style="color:#4a90d9;word-break:break-all;font-size:0.75rem;"></a></p>
-    <a id="download-link" class="download-btn" download="qrcode.png">PNGダウンロード</a>
+    <div class="btn-group">
+      <a id="download-svg" class="download-btn svg" download="qrcode.svg">SVGダウンロード</a>
+      <a id="download-png" class="download-btn png" download="qrcode.png">PNGダウンロード</a>
+    </div>
   </div>
 </div>
 <script>
@@ -145,27 +156,49 @@ function generateQR() {
 
   const sep = url.includes('?') ? '&' : '?';
   const fullUrl = params.length > 0 ? url + sep + params.join('&') : url;
-
-  const size = parseInt(document.getElementById('qr-size').value) || 512;
+  const size = parseInt(document.getElementById('qr-size').value) || 500;
 
   const qr = qrcode(0, 'M');
   qr.addData(fullUrl);
   qr.make();
 
   const moduleCount = qr.getModuleCount();
-  const padding = 15; // fixed 15px padding
-  const canvas = document.getElementById('qr-canvas');
+  const padding = 15;
+
+  // --- SVG generation ---
+  const svgSize = size;
+  const qrArea = svgSize - padding * 2;
+  const cellSize = qrArea / moduleCount;
+  let rects = '';
+  for (let row = 0; row < moduleCount; row++) {
+    for (let col = 0; col < moduleCount; col++) {
+      if (qr.isDark(row, col)) {
+        const x = padding + col * cellSize;
+        const y = padding + row * cellSize;
+        rects += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="#000"/>`;
+      }
+    }
+  }
+  const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgSize} ${svgSize}" width="${svgSize}" height="${svgSize}"><rect width="${svgSize}" height="${svgSize}" fill="#fff"/>${rects}</svg>`;
+  const svgBlob = new Blob([svgStr], { type: 'image/svg+xml' });
+  const svgUrl = URL.createObjectURL(svgBlob);
+
+  // Preview using SVG
+  const preview = document.getElementById('qr-preview');
+  preview.src = svgUrl;
+  preview.width = Math.min(size, 300);
+  preview.height = Math.min(size, 300);
+
+  // SVG download
+  document.getElementById('download-svg').href = svgUrl;
+
+  // --- PNG generation ---
+  const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
-
-  // White background
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, size, size);
-
-  // Draw QR modules centered with padding
-  const qrArea = size - padding * 2;
-  const cellSize = qrArea / moduleCount;
   ctx.fillStyle = '#000000';
   for (let row = 0; row < moduleCount; row++) {
     for (let col = 0; col < moduleCount; col++) {
@@ -179,11 +212,13 @@ function generateQR() {
       }
     }
   }
+  document.getElementById('download-png').href = canvas.toDataURL('image/png');
 
+  // URL link
   const urlLink = document.getElementById('generated-url-link');
   urlLink.href = fullUrl;
   urlLink.textContent = fullUrl;
-  document.getElementById('download-link').href = canvas.toDataURL('image/png');
+
   document.getElementById('qr-output').style.display = 'block';
 }
 </script>
